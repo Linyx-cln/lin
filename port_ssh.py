@@ -136,7 +136,7 @@ def arp_spoofing_packet_handling(ip_router, ip_target, mac_router, mac_target):
 
 target = str(sys.argv[1])
 confirmed_ip = check_ip(target)
-answer = input("SSH(s), Port Scanning(p), or arpspoofing(a) (s/p)? ")
+answer = input("SSH(s), Port Scanning(p), or arpspoofing(a) (s/p/a)? ")
 if answer.lower() == "s":
     ssh_brute_force_parameters()
 elif answer.lower() == "p":
