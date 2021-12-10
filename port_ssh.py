@@ -4,6 +4,7 @@ from IPy import IP
 import os
 import paramiko
 import threading, time
+import scapy.all as scapy
 
 open_port = []
 threading_count = 0
